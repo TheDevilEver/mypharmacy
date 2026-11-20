@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b3139">
+<title>ร้านยาจำลอง · Workshop</title>
+<style>
+  :root {
+    --primary: #eb1600;
+    --navy-canvas: #1b3139;
+    --navy-darker: #0b2026;
+    --navy-mid: #143d4a;
+    --navy-sub: #1b5162;
+    --ink: #1b3139;
+    --ink-soft: #5a6f77;
+    --ink-secondary: #90a5b1;
+    --canvas: #ffffff;
+    --cream: #eeede9;
+    --hairline: #c4ccd6;
+    --accent-blue-soft: #8acaff;
+    /* DM Sans ไม่มีตัวอักษรไทย จึงต่อด้วยฟอนต์ไทยของระบบ (ไม่โหลดไฟล์ภายนอก) */
+    --font-sans: "DM Sans", "Sukhumvit Set", "Noto Sans Thai", "Leelawadee UI", "Tahoma", system-ui, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--navy-canvas);
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 1136px; margin: 0 auto; padding: 0 20px; }
+
+  /* Top nav */
+  .top-nav {
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .top-nav .wrap {
+    display: flex; align-items: center; gap: 12px;
+    min-height: 62px;
+  }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--navy-canvas);
+    display: grid; place-items: center; flex: none;
+  }
+  .brand-mark span {
+    width: 12px; height: 12px; border-radius: 2px; background: var(--primary);
+  }
+  .brand-name { font-weight: 500; font-size: 16px; }
+
+  /* Hero on cream */
+  .hero-band { background: var(--cream); }
+  .hero-band .wrap { padding-top: 48px; padding-bottom: 48px; }
+  .mono-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px; line-height: 15px; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 0 0 16px;
+  }
+  .hero-heading {
+    font-weight: 500;
+    font-size: clamp(32px, 7vw, 60px);
+    line-height: 1.2;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  .hero-lead {
+    font-size: clamp(16px, 2.4vw, 20px);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 24px;
+    max-width: 40em;
+  }
+  .notice {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--canvas);
+    border: 1px solid var(--hairline);
+    border-left: 4px solid var(--ink);
+    border-radius: 6px;
+    padding: 12px 16px;
+    max-width: 40em;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .notice-tag {
+    font-family: var(--font-mono);
+    font-size: 12px; line-height: 20px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    flex: none;
+  }
+  .notice strong { font-weight: 600; }
+
+  /* Navy band with link cards */
+  .links-band .wrap { padding-top: 40px; padding-bottom: 60px; }
+  .section-heading-dark {
+    color: var(--canvas);
+    font-weight: 500;
+    font-size: clamp(24px, 4vw, 32px);
+    line-height: 1.25;
+    margin: 0 0 8px;
+  }
+  .section-sub {
+    color: var(--ink-secondary);
+    margin: 0 0 24px;
+    font-size: 15px;
+  }
+  .link-list {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 16px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .link-list { grid-template-columns: 1fr 1fr; }
+  }
+  .link-card {
+    display: flex; align-items: center; gap: 16px;
+    min-height: 96px;
+    padding: 20px 24px;
+    background: var(--navy-darker);
+    border: 1px solid var(--navy-mid);
+    border-radius: 20px;
+    color: var(--canvas);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color .15s ease, background-color .15s ease, transform .1s ease;
+  }
+  .link-card:hover { border-color: var(--ink-secondary); background: #0f2a32; }
+  .link-card:active { transform: scale(0.99); }
+  .link-card:focus-visible {
+    outline: 3px solid var(--accent-blue-soft);
+    outline-offset: 3px;
+  }
+  .link-num {
+    font-family: var(--font-mono);
+    font-size: 14px; line-height: 1;
+    color: var(--ink-secondary);
+    width: 40px; height: 40px; flex: none;
+    border: 1px solid var(--navy-sub);
+    border-radius: 6px;
+    display: grid; place-items: center;
+  }
+  .link-text { flex: 1; min-width: 0; }
+  .link-title {
+    display: block;
+    font-size: 20px; line-height: 28px; font-weight: 600;
+  }
+  .link-desc {
+    display: block;
+    font-size: 14px; line-height: 20px;
+    color: var(--ink-secondary);
+    margin-top: 4px;
+  }
+  .link-href {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px; line-height: 15px;
+    color: var(--ink-secondary);
+    opacity: .75;
+    margin-top: 8px;
+  }
+  .link-arrow {
+    flex: none;
+    width: 40px; height: 40px;
+    border-radius: 6px;
+    background: var(--primary);
+    display: grid; place-items: center;
+  }
+  .link-arrow svg { width: 18px; height: 18px; }
+
+  footer {
+    background: var(--navy-darker);
+    color: var(--ink-secondary);
+    font-size: 12px; line-height: 20px;
+  }
+  footer .wrap { padding-top: 20px; padding-bottom: 20px; }
+  footer .mono { font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+
+<header class="top-nav">
+  <div class="wrap">
+    <div class="brand-mark" aria-hidden="true"><span></span></div>
+    <div class="brand-name">ร้านยาจำลอง</div>
+  </div>
+</header>
+
+<main>
+  <section class="hero-band">
+    <div class="wrap">
+      <p class="mono-eyebrow">Pharmacy Workshop</p>
+      <h1 class="hero-heading">ระบบร้านยาจำลอง</h1>
+      <p class="hero-lead">เลือกหน้าที่ต้องการใช้งานจากรายการด้านล่าง</p>
+      <div class="notice" role="note">
+        <span class="notice-tag">หมายเหตุ</span>
+        <span><strong>ข้อมูลทั้งหมดเป็นข้อมูลจำลอง ห้ามใส่ชื่อผู้ป่วยจริง</strong></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="links-band" aria-labelledby="links-heading">
+    <div class="wrap">
+      <h2 id="links-heading" class="section-heading-dark">เมนูหลัก</h2>
+      <p class="section-sub">แตะปุ่มเพื่อเปิดหน้านั้น</p>
+      <ul id="link-list" class="link-list"></ul>
+      <noscript>
+        <p style="color:#fff">กรุณาเปิด JavaScript เพื่อแสดงเมนู</p>
+      </noscript>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">WORKSHOP</span> · ร้านยาจำลอง · ข้อมูลจำลองเพื่อการฝึกอบรมเท่านั้น
+  </div>
+</footer>
+
+<script>
+  // รายการลิงก์: เพิ่มหรือลบหน้าได้ด้วยการแก้หนึ่งบรรทัด (ปุ่มแสดงตามลำดับในอาร์เรย์นี้)
+  const LINKS = [
+    { href: "pos.html",       title: "หน้าขายยา",            desc: "เลือกยา กรอกจำนวน บันทึกการจ่ายยา" },
+    { href: "admin.html",     title: "จัดการระบบ (ผู้ดูแล)",  desc: "บัญชียา คลังรายล็อต รายการจ่าย ต้องใช้รหัสผู้ดูแล" },
+    { href: "dashboard.html", title: "Dashboard คลังยา",     desc: "ภาพรวมคลัง ล็อตใกล้หมดอายุ ยาต่ำกว่าจุดสั่งซื้อ" },
+    { href: "status.html",    title: "ตรวจสถานะระบบ",        desc: "ตรวจว่าการเชื่อมต่อแต่ละส่วนทำงานปกติ" },
+  ];
+
+  (function renderLinks() {
+    const list = document.getElementById("link-list");
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = String(text);
+      return node;
+    }
+
+    function arrowIcon() {
+      const svg = document.createElementNS(SVG_NS, "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS(SVG_NS, "path");
+      path.setAttribute("d", "M5 12h14M13 6l6 6-6 6");
+      path.setAttribute("stroke", "#ffffff");
+      path.setAttribute("stroke-width", "2.2");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("stroke-linejoin", "round");
+      svg.appendChild(path);
+      return svg;
+    }
+
+    LINKS.forEach(function (link, i) {
+      const li = el("li");
+      const a = el("a", "link-card");
+      a.setAttribute("href", link.href);
+
+      const num = el("span", "link-num", String(i + 1).padStart(2, "0"));
+      num.setAttribute("aria-hidden", "true");
+
+      const text = el("span", "link-text");
+      text.appendChild(el("span", "link-title", link.title));
+      text.appendChild(el("span", "link-desc", link.desc));
+      const hrefLabel = el("span", "link-href", link.href);
+      hrefLabel.setAttribute("aria-hidden", "true");
+      text.appendChild(hrefLabel);
+
+      const arrow = el("span", "link-arrow");
+      arrow.appendChild(arrowIcon());
+
+      a.appendChild(num);
+      a.appendChild(text);
+      a.appendChild(arrow);
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  })();
+</script>
+</body>
+</html>
