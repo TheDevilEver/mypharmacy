@@ -1,0 +1,211 @@
+/* ธีม Arc (ตาม arc.design.md): พื้นครีม ตัวอักษรดำ น้ำเงินไฟฟ้าใช้เป็นจุดเน้นเท่านั้น */
+:root{
+  --bg:#fffcec; --card:#fffcec; --card-2:#f5f4e2;
+  --line:#e1e0ce; --line-strong:#000000;
+  --text:#000000; --muted:#696969;
+  --primary:#3139fb; --primary-dark:#000354; --focus:#96c4ff;
+  --danger:#fb3a4d; --danger-soft:#fde3e5;
+  --warn:#b25e00; --warn-soft:#fbecd6;
+  --ok:#2f6b3a;
+  --btn-bg:#000000; --btn-fg:#fffcec; --btn-hover:#000354;
+  --th-bg:#f5f4e2;
+  --c-grid:#e1e0ce; --c-bar:#3139fb; --c-bar-2:#96c4ff; --c-bar-3:#000354;
+  --shadow:0 5px 10px rgba(0,0,0,.12);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0e0e14; --card:#16161f; --card-2:#1f1f2b;
+  --line:#2c2c3a; --line-strong:#8a8878;
+  --text:#fffcec; --muted:#a8a69a;
+  --primary:#6b72ff; --primary-dark:#cfd8ff; --focus:#96c4ff;
+  --danger:#ff6b7a; --danger-soft:#3a1a20;
+  --warn:#f0a94a; --warn-soft:#3a2a14;
+  --ok:#7bc489;
+  --btn-bg:#fffcec; --btn-fg:#000000; --btn-hover:#cdccdf;
+  --th-bg:#1f1f2b;
+  --c-grid:#2c2c3a; --c-bar:#6b72ff; --c-bar-2:#2f35b0; --c-bar-3:#cfd8ff;
+  --shadow:0 5px 10px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:"Inter","Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+  font-weight:500;line-height:1.5;min-height:100vh;
+  transition:background-color .2s,color .2s;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 16px 56px}
+.mono,.eyebrow{font-family:"IBM Plex Mono",Menlo,monospace}
+
+/* ---------- ส่วนหัว ---------- */
+header.top{
+  display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--line-strong);padding-bottom:20px;margin-bottom:16px
+}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--primary);margin-bottom:8px}
+h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-0.8px;line-height:1.1}
+.sub{color:var(--muted);font-size:15px;margin-top:6px}
+.asof{display:inline-block;margin-top:8px;padding:2px 10px;border:1px solid var(--line-strong);border-radius:9999px;font-size:12px}
+
+/* ---------- ปุ่ม ---------- */
+.btn,.tab{
+  background:var(--card);color:var(--text);border:1px solid var(--line-strong);
+  padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit;font-size:14px;font-weight:500;
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap
+}
+.btn:hover,.tab:hover{background:var(--card-2)}
+.btn:focus-visible,.tab:focus-visible,.kpi:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.btn.primary,.tab[aria-current="page"]{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg);font-weight:600}
+.btn.primary:hover,.tab[aria-current="page"]:hover{background:var(--btn-hover);border-color:var(--btn-hover)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg);border-color:var(--btn-bg)}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---------- เมนูแท็บ ---------- */
+nav.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;margin-bottom:8px;scrollbar-width:thin}
+
+/* ---------- ตัวกรองช่วงเวลา ---------- */
+.filterbar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:20px
+}
+.filterbar .lbl{font-size:13px;font-weight:700;color:var(--muted)}
+.filterbar .group{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.filterbar .range-info{color:var(--muted);font-size:13px;margin-left:auto}
+input[type=date],input[type=number],input[type=search],select{
+  background:var(--card);color:var(--text);border:1px solid var(--line-strong);border-radius:8px;
+  padding:6px 10px;font:inherit;font-size:14px
+}
+input[type=number]{width:80px}
+input:focus,select:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0 1px var(--focus)}
+
+/* ---------- มุมมอง ---------- */
+.view{display:none}
+.view.active{display:block}
+.view-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px;margin-bottom:16px}
+.view-head h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.view-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px;margin-bottom:16px}
+.kpi{
+  background:var(--card);border:1px solid var(--line);border-left:4px solid var(--primary);
+  border-radius:8px;padding:16px;text-align:left;font:inherit;color:inherit;display:block;width:100%
+}
+button.kpi{cursor:pointer}
+button.kpi:hover{box-shadow:var(--shadow)}
+.kpi.danger{border-left-color:var(--danger)}
+.kpi.warn{border-left-color:var(--warn)}
+.kpi .label{color:var(--muted);font-size:13px}
+.kpi .value{font-size:30px;font-weight:700;letter-spacing:-0.8px;margin:4px 0 2px;line-height:1.1}
+.kpi .hint{color:var(--muted);font-size:12px}
+.kpi .go{float:right;font-size:12px;color:var(--muted)}
+
+/* ---------- แผง ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;min-width:0}
+.panel.full{grid-column:1/-1}
+.panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.panel h3{font-size:17px;font-weight:700;letter-spacing:-0.3px;margin:0}
+.panel .desc{margin:2px 0 0;color:var(--muted);font-size:13px}
+.chart-box{position:relative;height:300px;width:100%}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.tools input[type=search]{flex:1 1 200px}
+.count{color:var(--muted);font-size:13px;margin-bottom:6px}
+.empty{color:var(--muted);font-size:14px;padding:16px;text-align:center}
+
+/* ---------- ตาราง ---------- */
+.table-scroll{overflow:auto;max-height:520px;border-radius:8px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--th-bg);font-weight:600;z-index:1;border-bottom:1px solid var(--line-strong)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--card-2)}
+tr.flag-high{background:var(--danger-soft)}
+tr.flag-medium{background:var(--warn-soft)}
+tr.flag-high td:first-child{box-shadow:inset 4px 0 0 var(--danger)}
+tr.flag-medium td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
+tr.flag-low td:first-child{box-shadow:inset 4px 0 0 var(--focus)}
+
+/* ---------- ป้ายสถานะ ---------- */
+.badge{
+  display:inline-block;padding:1px 8px;border-radius:9999px;font-size:12px;font-weight:600;
+  border:1px solid currentColor;line-height:1.6;white-space:nowrap
+}
+.badge.danger{color:var(--danger)}
+.badge.warn{color:var(--warn)}
+.badge.info{color:var(--primary)}
+.badge.muted{color:var(--muted)}
+.badge.ok{color:var(--ok)}
+.badge.solid-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.badge + .badge{margin-left:4px}
+
+/* ---------- กล่องงานด่วน ---------- */
+.todo{list-style:none;margin:0;padding:0 4px 0 0;max-height:440px;overflow-y:auto}
+.todo li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.todo li:last-child{border-bottom:0}
+.todo .what{flex:1;min-width:0}
+.todo .what b{display:block}
+.todo .what span{color:var(--muted);font-size:13px}
+
+/* ---------- ไทม์ไลน์หมดอายุ (bucket) ---------- */
+.buckets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.bucket{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--card);cursor:pointer;font:inherit;color:inherit;text-align:left}
+.bucket[aria-pressed="true"]{outline:2px solid var(--text);outline-offset:-1px}
+.bucket .n{font-size:26px;font-weight:700;letter-spacing:-0.6px;line-height:1.1}
+.bucket .t{font-size:13px;color:var(--muted)}
+.bucket.danger{border-top:4px solid var(--danger)}
+.bucket.warn{border-top:4px solid var(--warn)}
+.bucket.info{border-top:4px solid var(--primary)}
+.bucket.calm{border-top:4px solid var(--focus)}
+.bucket.ok{border-top:4px solid var(--line-strong)}
+
+.settings{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:14px}
+.settings label{display:flex;gap:6px;align-items:center}
+.note{color:var(--muted);font-size:13px;margin:8px 0 0}
+
+footer{color:var(--muted);font-size:12px;margin-top:32px;border-top:1px solid var(--line);padding-top:16px}
+
+.error-box{border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:16px;margin:16px 0}
+.error-box code{background:var(--card-2);padding:1px 6px;border-radius:4px;color:var(--text)}
+
+/* ---------- ใบสั่งซื้อ (แสดงเฉพาะตอนพิมพ์) ---------- */
+#print-po{display:none}
+
+@media (max-width:760px){
+  .buckets{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid,.grid.two{grid-template-columns:minmax(0,1fr)}
+  .filterbar .range-info{margin-left:0;width:100%}
+}
+@media (max-width:600px){
+  .wrap{padding:20px 16px 40px}
+  h1{font-size:26px;letter-spacing:-0.6px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi .value{font-size:24px}
+  .panel{padding:14px}
+  .chart-box{height:260px}
+  .view-head h2{font-size:20px}
+}
+@media (max-width:380px){ .kpis{grid-template-columns:minmax(0,1fr)} }
+
+@media print{
+  :root{--bg:#fff;--card:#fff}
+  body{background:#fff;color:#000}
+  .wrap > *{display:none !important}
+  #print-po{display:block !important;font-size:12pt;color:#000}
+  #print-po h1{font-size:20pt}
+  #print-po table{font-size:10pt}
+  #print-po th{position:static;background:#eee;color:#000}
+  #print-po td,#print-po th{border:1px solid #999;white-space:normal}
+  #print-po .sign{display:flex;gap:48px;margin-top:48px}
+  #print-po .sign div{flex:1;border-top:1px solid #000;padding-top:6px;text-align:center}
+  @page{size:A4;margin:14mm}
+}
+
+/* แหล่งข้อมูล: ป้ายเขียว (Supabase) และแถบเหลือง (ไฟล์สำรอง) ใช้ตัวแปรสีของธีมเดิม */
+.src-badge{display:inline-block;margin:8px 0 0 6px;padding:2px 10px;border:1px solid var(--ok);border-radius:9999px;font-size:12px;color:var(--ok);font-weight:600}
+.src-banner{border:1px solid var(--warn);border-left:6px solid var(--warn);background:var(--warn-soft);color:var(--text);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:14px}
+.src-banner b{color:var(--warn)}
+.src-badge[hidden],.src-banner[hidden]{display:none}

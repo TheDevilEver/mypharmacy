@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คลังยาและการจ่ายยา</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // ตั้งธีมก่อนวาดหน้า เพื่อไม่ให้หน้าจอกะพริบ
+  (function(){
+    var t = null;
+    try { t = localStorage.getItem('d2-theme'); } catch(e) {}
+    if (!t) t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Pharmacy Operations · Dashboard</div>
+      <h1>คลังยาและการจ่ายยา</h1>
+      <div class="sub">จัดการคงคลัง ตรวจวันหมดอายุ วางแผนสั่งซื้อ และตรวจสอบรายการจ่ายยา</div>
+      <span class="asof mono" id="asof-label">ข้อมูล ณ —</span>
+      <!-- ป้ายแหล่งข้อมูล: เขียว = Supabase ผ่าน /api/data, app.js เป็นผู้เติมข้อความ -->
+      <span class="src-badge" id="source-badge" hidden></span>
+    </div>
+    <div class="head-actions">
+      <button type="button" class="btn" id="theme-toggle" aria-label="สลับโหมดสว่าง/มืด">โหมดมืด</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="เมนูแดชบอร์ด">
+    <a class="tab" href="#overview" data-view="overview">ภาพรวม</a>
+    <a class="tab" href="#stock" data-view="stock">คลังยา</a>
+    <a class="tab" href="#expiry" data-view="expiry">ตรวจวันหมดอายุ</a>
+    <a class="tab" href="#order" data-view="order">การสั่งซื้อ</a>
+    <a class="tab" href="#dispense" data-view="dispense">รายการจ่ายยา</a>
+  </nav>
+
+  <section class="filterbar" aria-label="ตัวกรองช่วงเวลา">
+    <span class="lbl">ช่วงเวลา</span>
+    <div class="group" role="group" aria-label="ช่วงเวลาสำเร็จรูป">
+      <button type="button" class="btn sm" data-preset="7">7 วัน</button>
+      <button type="button" class="btn sm" data-preset="14">14 วัน</button>
+      <button type="button" class="btn sm" data-preset="all">ทั้งหมด</button>
+    </div>
+    <div class="group">
+      <label for="date-from">ตั้งแต่</label>
+      <input type="date" id="date-from">
+      <span>ถึง</span>
+      <input type="date" id="date-to" aria-label="ถึงวันที่">
+    </div>
+    <span class="range-info" id="range-info"></span>
+  </section>
+
+  <!-- แถบสีเหลือง: แสดงเมื่อ /api/data ใช้ไม่ได้และต้องอ่านไฟล์ JSON สำรอง -->
+  <div class="src-banner" id="source-banner" role="status" hidden></div>
+  <div id="error"></div>
+
+  <!-- ภาพรวม -->
+  <section class="view" id="view-overview" aria-labelledby="h-overview">
+    <div class="view-head">
+      <div><h2 id="h-overview">ภาพรวม</h2><p>สรุปทุกด้าน กดการ์ดเพื่อไปยังแท็บที่เกี่ยวข้อง</p></div>
+    </div>
+    <div class="kpis" id="ov-kpis"></div>
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><div><h3>ต้องจัดการด่วน</h3><p class="desc">เรียงตามความรุนแรง</p></div></div>
+        <ul class="todo" id="ov-todo"></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>การจ่ายยารายวัน</h3><p class="desc">จำนวนครั้งที่จ่ายในช่วงที่เลือก</p></div></div>
+        <div class="chart-box"><canvas id="ov-chart"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- คลังยา -->
+  <section class="view" id="view-stock" aria-labelledby="h-stock">
+    <div class="view-head">
+      <div><h2 id="h-stock">คลังยา</h2><p>ยอดพร้อมจ่ายนับเฉพาะล็อต active · ล็อต quarantine แสดงแยก</p></div>
+    </div>
+    <div class="kpis" id="st-kpis"></div>
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><div><h3>มูลค่าคงคลังพร้อมจ่ายตามหมวด</h3><p class="desc">บาท (qty_on_hand × unit_cost)</p></div></div>
+        <div class="chart-box"><canvas id="st-chart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>ล็อตกักกันและล็อตผิดปกติ</h3><p class="desc">ไม่นับรวมในยอดพร้อมจ่าย</p></div></div>
+        <ul class="todo" id="st-issues"></ul>
+      </div>
+      <div class="panel full">
+        <div class="panel-head">
+          <div><h3>รายการคงคลังรายล็อต</h3><p class="desc">ค้นหาจาก SKU ชื่อยา หรือเลขล็อต</p></div>
+          <button type="button" class="btn sm" data-csv="stock">ดาวน์โหลด CSV</button>
+        </div>
+        <div class="tools">
+          <input type="search" id="st-search" placeholder="ค้นหา..." aria-label="ค้นหาคงคลัง">
+          <select id="st-status" aria-label="กรองสถานะ">
+            <option value="">ทุกสถานะ</option>
+            <option value="active">active</option>
+            <option value="quarantine">quarantine</option>
+            <option value="written_off">written_off</option>
+          </select>
+          <select id="st-cat" aria-label="กรองหมวด"><option value="">ทุกหมวด</option></select>
+        </div>
+        <div class="count" id="st-count"></div>
+        <div class="table-scroll"><table id="st-table"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ตรวจวันหมดอายุ -->
+  <section class="view" id="view-expiry" aria-labelledby="h-expiry">
+    <div class="view-head">
+      <div><h2 id="h-expiry">ตรวจวันหมดอายุ</h2><p>นับวันจาก as_of · คาดการณ์ด้วยหลัก FEFO และอัตราการใช้ในช่วงที่เลือก</p></div>
+    </div>
+    <div class="buckets" id="ex-buckets"></div>
+    <div class="kpis" id="ex-kpis"></div>
+    <div class="grid">
+      <div class="panel full">
+        <div class="panel-head">
+          <div><h3>ล็อตที่คาดว่าจ่ายไม่ทันก่อนหมดอายุ</h3><p class="desc">จำนวนคาดว่าเหลือทิ้ง = ยอดล็อต − ยอดที่จ่ายได้ก่อนหมดอายุ (หลังหักล็อตที่หมดอายุก่อนตามลำดับ FEFO)</p></div>
+          <button type="button" class="btn sm" data-csv="risk">ดาวน์โหลด CSV</button>
+        </div>
+        <div class="table-scroll"><table id="ex-risk"></table></div>
+      </div>
+      <div class="panel full">
+        <div class="panel-head">
+          <div><h3>ลำดับการจ่ายตามหลัก FEFO</h3><p class="desc">ล็อต active ทั้งหมด เรียงตาม SKU และวันหมดอายุ (จ่ายล็อตลำดับ 1 ก่อน)</p></div>
+          <button type="button" class="btn sm" data-csv="fefo">ดาวน์โหลด CSV</button>
+        </div>
+        <div class="count" id="ex-count"></div>
+        <div class="table-scroll"><table id="ex-table"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- การสั่งซื้อ -->
+  <section class="view" id="view-order" aria-labelledby="h-order">
+    <div class="view-head">
+      <div><h2 id="h-order">การสั่งซื้อ</h2><p>30 SKU ที่มีสต็อก · อัตราการใช้คิดจากช่วงเวลาที่เลือก</p></div>
+      <div class="head-actions">
+        <button type="button" class="btn sm" data-csv="order">ดาวน์โหลด CSV</button>
+        <button type="button" class="btn sm primary" id="print-po-btn">พิมพ์ใบสั่งซื้อ</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="settings">
+        <label>Lead time <input type="number" id="lead" min="0" max="90" value="7"> วัน</label>
+        <label>วันสำรอง <input type="number" id="cover" min="0" max="180" value="30"> วัน</label>
+        <label><input type="checkbox" id="only-need" checked> แสดงเฉพาะที่ต้องสั่ง</label>
+      </div>
+      <p class="note">จำนวนแนะนำ = ⌈อัตราการใช้/วัน × (lead time + วันสำรอง) + reorder_level − ยอดพร้อมจ่าย⌉ · ต้องสั่งเมื่อยอดพร้อมจ่าย &lt; reorder_level หรือยาพอใช้ &lt; lead time</p>
+    </div>
+    <div class="kpis" id="or-kpis"></div>
+    <div class="panel">
+      <div class="count" id="or-count"></div>
+      <div class="table-scroll"><table id="or-table"></table></div>
+    </div>
+  </section>
+
+  <!-- รายการจ่ายยา -->
+  <section class="view" id="view-dispense" aria-labelledby="h-dispense">
+    <div class="view-head">
+      <div><h2 id="h-dispense">รายการจ่ายยา</h2><p id="di-source-note">KPI นับเฉพาะ type = dispense · void และ return แสดงแยก</p></div>
+    </div>
+    <div class="kpis" id="di-kpis"></div>
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><div><h3>จำนวนครั้งที่จ่ายรายวัน</h3></div></div>
+        <div class="chart-box"><canvas id="di-daily"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>ช่วงเวลาที่จ่ายยา</h3><p class="desc">จำนวนครั้งต่อชั่วโมง</p></div></div>
+        <div class="chart-box"><canvas id="di-hour"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>ยาที่จ่ายมากที่สุด 10 อันดับ</h3><p class="desc">ตามจำนวนหน่วยที่จ่าย</p></div></div>
+        <div class="chart-box"><canvas id="di-top"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>ภาระงานเภสัชกร</h3><p class="desc">จำนวนครั้งที่จ่าย</p></div></div>
+        <div class="chart-box"><canvas id="di-rx"></canvas></div>
+      </div>
+      <div class="panel full">
+        <div class="panel-head">
+          <div><h3>รายการจ่ายยา</h3><p class="desc">แถวที่มีแถบสีคือรายการติดธง ชี้ที่ป้ายเพื่อดูรายละเอียด</p></div>
+          <button type="button" class="btn sm" data-csv="dispense">ดาวน์โหลด CSV</button>
+        </div>
+        <div class="tools">
+          <input type="search" id="di-search" placeholder="ค้นหา ID, SKU, ชื่อยา, ผู้ป่วย, เภสัชกร..." aria-label="ค้นหารายการจ่ายยา">
+          <select id="di-rx-filter" aria-label="กรองเภสัชกร"><option value="">เภสัชกรทุกคน</option></select>
+          <label class="btn sm"><input type="checkbox" id="di-flag-only"> เฉพาะรายการติดธง</label>
+        </div>
+        <div class="count" id="di-count"></div>
+        <div class="table-scroll"><table id="di-table"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    ข้อมูลจำลองเพื่อการเรียนเท่านั้น · patient_code เป็นรหัสแฝง · reorder_level เป็นนโยบายสมมติของร้าน ·
+    แหล่งข้อมูล: <span id="footer-source">—</span>
+  </footer>
+</div>
+
+<!-- ใบสั่งซื้อ (แสดงเฉพาะตอนพิมพ์) -->
+<div id="print-po"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
