@@ -118,6 +118,8 @@
   .btn.secondary:hover:not(:disabled) { background: rgba(27, 49, 57, 0.06); }
   .btn.danger { background: transparent; color: var(--error-ink); border: 2px solid var(--red); }
   .btn.danger:hover:not(:disabled) { background: var(--error-bg); }
+  .home-link { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 16px; }
+  .home-link span { font-family: var(--mono); }
   .btn.sm { padding: 4px 14px; min-height: 36px; font-size: 16px; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
 
@@ -247,6 +249,7 @@
 <header class="top">
   <div class="top-inner">
     <div class="brand">
+      <a class="btn secondary home-link" href="index.html"><span aria-hidden="true">←</span> กลับหน้าแรก</a>
       <h1>ระบบจัดการร้านยา</h1>
       <p class="sub">หน้าผู้ดูแล · ข้อมูลจำลอง รหัสผู้ป่วยเป็นรหัสแฝง</p>
       <p class="asof">วันอ้างอิงของระบบ <b id="asof">กำลังโหลด…</b></p>
